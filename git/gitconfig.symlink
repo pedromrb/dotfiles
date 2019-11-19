@@ -1,0 +1,239 @@
+[user]
+  name = Pedro Brás
+  email = pedro@bras.com
+[github]
+  user = pedromrb
+[alias]
+  # Add
+  a = add
+  # Commit
+  cm = commit -m
+  ca = commit --amend
+  can = commit --amend --no-edit
+
+  # Checkout
+  co = checkout
+  cb = checkout -b
+
+  # cherry-pick - apply the changes introduced by some existing commits; useful for moving small chunks of code between branches.
+  cp = cherry-pick
+
+  # cherry-pick - abort the picking process
+  cpa = cherry-pick --abort
+
+  # cherry-pick - continue the picking process
+  cpc = cherry-pick --continue
+
+  # rebase - forward-port local commits to the updated upstream head.
+  rb = rebase
+
+  # rebase - continue the rebasing process after resolving a conflict manually and updating the index with the resolution.
+  rbc = rebase --continue
+
+  # rebase abort - cancel the rebasing process
+  rba = rebase --abort
+
+  # rebase - restart the rebasing process by skipping the current patch.
+  rbs = rebase --skip
+
+  # rbi - rebase interactive on our unpushed commits.
+  ri = rebase --interactive --autosquash
+
+  # Diff
+  df = diff
+
+  # List
+  tl = tag -l
+  bl = branch -a
+  rl = remote -v
+
+  # Status
+  st = status -s
+  sl = stash list
+
+  # Pull
+  pl   = pull
+  plo  = pull --rebase origin
+  plom = pull --rebase origin master
+  plog = pull --rebase origin gh-pages
+  plu  = pull --rebase upstream
+  plum = pull --rebase upstream master
+  plug = pull --rebase upstream gh-pages
+
+  # Push
+  ps   = push
+  pso  = push origin
+  psom = push origin master
+  psog = push origin gh-pages
+  psu  = push upstream
+  psum = push upstream master
+  psug = push upstream gh-pages
+
+  # Merge request
+  mr = !sh -c 'git fetch $1 merge-requests/$2/head:mr-$1-$2 && git checkout mr-$1-$2' -
+
+  # Logs
+  l     = log --pretty=oneline --decorate --abbrev-commit --max-count=15
+  ll    = log --graph --pretty=format:'%Cred%h%Creset %an: %s %Creset%Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+
+  # Sync
+  sync = plu && pso
+
+  todo              = !"git ls-files | xargs find-todo-tags | awk -F: '{ print $1,$2; print $3,$4; print $5}' | grcat conf.todo-tags "
+  ci                = commit
+  st                = status
+  br                = branch
+  count             = !git shortlog -sn
+  lg                = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  fru               = !git fetch upstream
+  fo                = !git fetch origin
+  fro               = !git fetch origin && git rebase origin/master
+  fru               = !git fetch upstream && git rebase upstream/master
+  stup              = !git stash && git fro && git stash pop
+  type              = cat-file -t
+  dump              = cat-file -p
+  wip               = !"git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m \"wip\""
+  unwip             = !"git log -n 1 | grep -q -c wip && git reset HEAD~1"
+  head              = !"git log -n1"
+  lost              = !"git fsck | awk '/dangling commit/ {print $3}' | git show --format='SHA1: %C(yellow)%h%Creset %f' --stdin | awk '/SHA1/ {sub(\"SHA1: \", \"\"); print}'"
+  tags              = !"git tag | sort -t . -k1,1n -k 2,2n -k 3,3n -k 2,2"
+  undo              = !"git reset --soft HEAD^"
+  fixup             = !sh -c 'git commit -m \"fixup! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+  squash            = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+  rank-contributers = !"git shortlog -s -n --no-merges"
+  open-unmerged     = !git diff --name-only --diff-filter=U | xargs subl
+  up                = "!git remote update -p; git merge --ff-only @{u}"
+  resume            = !"git log --since=8.hours --abbrev-commit --author=\"<$(git config user.email)>\" --format=%s --reverse"
+  add-tag           = tag
+  remove-tag        = tag -d
+
+  # Assume
+  #
+  # Sometimes we want to change a file in a repo, but never check in your edits.
+  # We can't use .gitignore because the file is tracked. We use update-index.
+  #
+  # If you interact with big corporate projects, such as projects in Subversion,
+  # then you might run into the need to ignore certain files which are under
+  # Subversion control, yet you need to modify them but not commit.
+  # The assume-unchanged flag comes to the rescue.
+  #
+  # Suppose we want to edit passwords.txt and for god's sake never check it in:
+  #
+  #     $ git status
+  #     modified passwords.txt
+  #     modified foo.txt
+  #
+  #     $ git assume passwords.txt
+  #     $ git status
+  #     modified foo.txt
+  #
+  #     $ git assumed
+  #     passwords.txt
+  #
+  #     $ git unassume passwords.txt
+  #     $ git status
+  #     modified passwords.txt
+  #     modified foo.txt
+  #
+  # Thanks to http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/
+  # Thanks to http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
+  assume   = update-index --assume-unchanged
+  unassume = update-index --no-assume-unchanged
+  assume-all = "!git st -s | awk {'print $2'} | xargs git assume"
+  unassume-all = "!git assumed | xargs git update-index --no-assume-unchanged"
+  assumed  = !"git ls-files -v | grep ^h | cut -c 3-"
+
+  # Stash snapshot - from http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
+  # Take a snapshot of your current working tree without removing changes.
+  # This is handy for refactoring where you can't quite fit what you've done
+  # into a commit but daren't stray too far from now without a backup.
+  #
+  # Running this:
+  #
+  #    $ git snapshot
+  #
+  # Creates this stash:
+  #
+  #    stash@{0}: On feature/handy-git-tricks: snapshot: Mon Apr 8 12:39:06 BST 2013
+  #
+  # And seemingly no changes to your working tree.
+  #
+  snapshot = !git stash push "snapshot: $(date)" && git stash apply "stash@{0}"
+[color]
+  ui = true
+  diff = auto
+  status = auto
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+[color "status"]
+  added     = cyan bold
+  branch    = cyan bold
+  changed   = magenta bold
+  deleted   = red bold
+  untracked = yellow bold
+[push]
+  default = simple
+[core]
+  excludesfile = ~/.gitignore
+  editor = vim
+
+[apply]
+  whitespace = fix
+
+[rerere]
+  enabled = 1
+
+[branch "master"]
+  remote = origin
+  merge = refs/heads/master
+  rebase= true
+
+[branch "develop"]
+  merge = refs/heads/develop
+  remote = origin
+  rebase= true
+
+[branch]
+  autosetuprebase = always
+
+[rebase]
+  autosquash = true
+
+[credential]
+  helper = osxkeychain
+
+[url "git@github.com:"]
+  isteadOf = git://github.com/
+  insteadOf = https://github.com/
+
+[difftool "Kaleidoscope"]
+  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[mergetool "Kaleidoscope"]
+  cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+  trustExitCode = true
+[diff]
+  tool = Kaleidoscope
+  algorithm = patience
+[difftool]
+  prompt = false
+[mergetool]
+  prompt = false
+  keepBackup = true
+[merge]
+  tool = Kaleidoscope
+[remote "origin"]
+  push = HEAD
+[filter "media"]
+  clean = git media clean %f
+  smudge = git media smudge %f
+  required = true
+[pull]
+  rebase = true
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
